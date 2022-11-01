@@ -11,6 +11,14 @@ class booking(scrapy.Spider):
     # Name of your spider
     name = "booking"
 
+    custom_settings = {
+        'FEED_FORMAT': 'json',
+        'FEED_EXPORTERS': {
+            'json': 'scrapy.exporters.JsonItemExporter',
+        },
+        'FEED_EXPORT_ENCODING': 'utf-8',
+    }
+
     # Callback function that will be called when starting your spider
     # It will get text, author and tags of the first <div> with class="quote"
 
@@ -36,9 +44,8 @@ class booking(scrapy.Spider):
                 'name':hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a/div[1]/text()').get(),
                 'rating': hotel.xpath('div[1]/div[2]/div/div/div[2]/div[1]/a/span/div/div[1]/text()').get(),
                 'url': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a/@href').extract_first(),
-                'text_description': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[4]/text()').get()
+                'text_description': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[4]/text()').get(),
                 }
-
                 
      
 # hotel name,

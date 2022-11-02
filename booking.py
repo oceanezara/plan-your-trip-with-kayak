@@ -39,7 +39,8 @@ class booking(scrapy.Spider):
     def parse(self, response):
         #hotels = response.xpath('//*[@id="search_results_table"]/div[2]/div/div/div/div[3]/div')
         hotels = response.css('div.a826ba81c4.fe821aea6c.fa2f36ad22.afd256fc79.d08f526e0d.ed11e24d01.ef9845d4b3.da89aeb942')
-        for hotel in hotels:
+        limit = 19
+        for index, hotel in enumerate(hotels):
             yield {
                 # 'city': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/span/span[1]/text()').get(),
                 # 'name':hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a/div[1]/text()').get(),
@@ -47,6 +48,8 @@ class booking(scrapy.Spider):
                 'url': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a/@href').extract_first(),
                 # 'text_description': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[4]/text()').get(),
                 }
+            if index == limit:
+                break
 
            
  

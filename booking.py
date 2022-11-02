@@ -37,17 +37,22 @@ class booking(scrapy.Spider):
             yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-        hotels = response.xpath('//*[@id="search_results_table"]/div[2]/div/div/div/div[3]/div')
+        #hotels = response.xpath('//*[@id="search_results_table"]/div[2]/div/div/div/div[3]/div')
+        hotels = response.css('div.a826ba81c4.fe821aea6c.fa2f36ad22.afd256fc79.d08f526e0d.ed11e24d01.ef9845d4b3.da89aeb942')
         for hotel in hotels:
             yield {
-                'city': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/span/span[1]/text()').get(),
-                'name':hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a/div[1]/text()').get(),
-                'rating': hotel.xpath('div[1]/div[2]/div/div/div[2]/div[1]/a/span/div/div[1]/text()').get(),
+                # 'city': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/span/span[1]/text()').get(),
+                # 'name':hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a/div[1]/text()').get(),
+                # 'rating': hotel.xpath('div[1]/div[2]/div/div/div[2]/div[1]/a/span/div/div[1]/text()').get(),
                 'url': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a/@href').extract_first(),
-                'text_description': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[4]/text()').get(),
+                # 'text_description': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[4]/text()').get(),
                 }
-                
-     
+
+           
+ 
+
+
+            
 # hotel name,
 # *   Url to its booking.com page,
 # *   Its coordinates: latitude and longitude

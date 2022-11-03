@@ -29,48 +29,25 @@ class booking(scrapy.Spider):
             url = path.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a').attrib['href']
 
              # call parse_details and pass all of the above to it
-            dic = {
+            dict_hotel = {
                 'url' : url
             } 
 
             try:
-                yield response.follow(url = url, callback = self.parse_detail, cb_kwargs = {'dic':dic})
+                yield response.follow(url = url, callback = self.parse_detail, cb_kwargs = {'dic':dict_hotel})
             
             except:
-                yield dic
+                yield dict_hotel
           
 
 
     def parse_detail(self,response,dic):
 
         lat_lon = response.css('a.jq_tooltip.loc_block_link_underline_fix.bui-link.show_on_map_hp_link.show_map_hp_link').attrib['data-atlas-latlng']
-        dic['gps'] = lat_lon
+        dic['coordinates'] = lat_lon
         yield dic
 
-       
 
-  
-
-            # yield response.follow(url=url, callback=self.parse_hotel, cb_kwargs={'dic' : hotel_dict})
-          
-    # def parse_hotel(self, response):
-    #     yield {
-    #         **response.meta,
-    #         'hotel_name': 'hello'
-    #     }
-    #     print(response)
-          
-    
-        # url=response.request.meta.hotel_dict.url
-        # rows = response.xpath("(//table[@class='table table-striped table-bordered table-hover table-condensed table-list'])[1]/tbody/tr")
-        # for el in url:
-        #     name=row.xpath(".//td[1]/text()").get()
-  
-        #     yield{
-        #         'country_name': name,
-                
-        #     }
-    
 
 filename = "hotel_url.json"
 

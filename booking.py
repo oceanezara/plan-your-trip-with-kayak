@@ -17,11 +17,14 @@ class booking(scrapy.Spider):
 
 
     def parse(self, response):
-        return scrapy.FormRequest.from_response(
-            response,
-            formdata={'ss': 'Marseille'},
-            callback=self.after_search
-        )
+        file = open('/Users/oceane/Desktop/plan-your-trip-with-kayak/kayak/kayak/top_city_names.txt', 'r')
+        cities = file.readlines()
+        for city in cities:
+            yield scrapy.FormRequest.from_response(
+                response,
+                formdata={'ss': city},
+                callback=self.after_search
+            )
 
     def after_search(self, response):
         for path in response.xpath('//*[@data-testid="property-card"]'):

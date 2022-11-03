@@ -3,7 +3,7 @@ from scrapy.crawler import CrawlerProcess
 import logging
 import os
 from scrapy.linkextractors import LinkExtractor
-
+from scrapy import Request
 
    
 
@@ -11,58 +11,68 @@ class booking(scrapy.Spider):
     # Name of your spider
     name = "booking"
 
-    custom_settings = {
-        'FEED_FORMAT': 'json',
-        'FEED_EXPORTERS': {
-            'json': 'scrapy.exporters.JsonItemExporter',
-        },
-        'FEED_EXPORT_ENCODING': 'utf-8',
-    }
+    start_urls = [
+        'https://www.booking.com/'
+    ]
 
-    # Callback function that will be called when starting your spider
-    # It will get text, author and tags of the first <div> with class="quote"
-
-    def start_requests(self):
-        # Defining cities
-        cities =  ['Collioure', 'Cassis', 'Marseille', 'Bormes-les-Mimosas', 'Aigues-Mortes']
-        # Creating urls from cities
-        urls = []
-
-        for city in cities:
-            urls.append(f'https://www.booking.com/searchresults.fr.html?aid=304142&label=gen173nr-1FCAQoggJCGXNlYXJjaF9ib3JtZXMtbGVzLW1pbW9zYXNIDVgEaE2IAQGYAQ24AQfIAQzYAQHoAQH4AQOIAgGoAgO4ApGLhZsGwAIB0gIkMTU2MWY1NzctNmEyMi00ZjVjLWI3OGUtNDBjYTBiNmQ1OWRh2AIF4AIB&ss={city}&order=bayesian_review_score')
-
-        
-        # Launching crawling process for each city
-        for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-        #hotels = response.xpath('//*[@id="search_results_table"]/div[2]/div/div/div/div[3]/div')
-        hotels = response.css('div.a826ba81c4.fe821aea6c.fa2f36ad22.afd256fc79.d08f526e0d.ed11e24d01.ef9845d4b3.da89aeb942')
-        limit = 19
-        for index, hotel in enumerate(hotels):
-            yield {
-                # 'city': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[2]/div[1]/a/span/span[1]/text()').get(),
-                # 'name':hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a/div[1]/text()').get(),
-                # 'rating': hotel.xpath('div[1]/div[2]/div/div/div[2]/div[1]/a/span/div/div[1]/text()').get(),
-                'url': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a/@href').extract_first(),
-                # 'text_description': hotel.xpath('div[1]/div[2]/div/div/div[1]/div/div[4]/text()').get(),
-                }
-            if index == limit:
-                break
+        return scrapy.FormRequest.from_response(
+            response,
+            formdata={'ss': 'Marseille'},
+            callback=self.after_search
+        )
 
-           
- 
+    def after_search(self, response):
+        for path in response.xpath('//*[@data-testid="property-card"]'):
+        
+            url = path.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a').attrib['href']
 
+             # call parse_details and pass all of the above to it
+            dic = {
+                'url' : url
+            } 
 
+            try:
+                yield response.follow(url = url, callback = self.parse_detail, cb_kwargs = {'dic':dic})
             
-# hotel name,
-# *   Url to its booking.com page,
-# *   Its coordinates: latitude and longitude
-# *   Score given by the website users
-# *   Text description of the hotel
-# Name of the file where the results will be saved
-filename = "test.json"
+            except:
+                yield dic
+          
+
+
+    def parse_detail(self,response,dic):
+
+        lat_lon = response.css('a.jq_tooltip.loc_block_link_underline_fix.bui-link.show_on_map_hp_link.show_map_hp_link').attrib['data-atlas-latlng']
+        dic['gps'] = lat_lon
+        yield dic
+
+       
+
+  
+
+            # yield response.follow(url=url, callback=self.parse_hotel, cb_kwargs={'dic' : hotel_dict})
+          
+    # def parse_hotel(self, response):
+    #     yield {
+    #         **response.meta,
+    #         'hotel_name': 'hello'
+    #     }
+    #     print(response)
+          
+    
+        # url=response.request.meta.hotel_dict.url
+        # rows = response.xpath("(//table[@class='table table-striped table-bordered table-hover table-condensed table-list'])[1]/tbody/tr")
+        # for el in url:
+        #     name=row.xpath(".//td[1]/text()").get()
+  
+        #     yield{
+        #         'country_name': name,
+                
+        #     }
+    
+
+filename = "hotel_url.json"
 
 # If file already exists, delete it before crawling (because Scrapy will 
 # concatenate the last and new results otherwise)
@@ -74,7 +84,7 @@ if filename in os.listdir():
 ## USER_AGENT => Simulates a browser on an OS
 ## LOG_LEVEL => Minimal Level of Log 
 ## FEEDS => Where the file will be stored 
-## More info on built-in settings => https://docs.scrapy.org/en/latest/topics/settings.html?highlight=settings#settings
+## More info on built-in settings => https://docs.scrapy.org/en/lahotel_url/topics/settings.html?highlight=settings#settings
 process = CrawlerProcess(settings = {
     'USER_AGENT': 'Chrome/97.0',
     'LOG_LEVEL': logging.INFO,

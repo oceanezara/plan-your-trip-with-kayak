@@ -27,7 +27,10 @@ class booking(scrapy.Spider):
             )
 
     def after_search(self, response):
-        for path in response.xpath('//*[@data-testid="property-card"]'):
+
+        limit = 19
+        
+        for index, path in enumerate(response.xpath('//*[@data-testid="property-card"]')):
         
             url = path.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a').attrib['href']
 
@@ -41,6 +44,9 @@ class booking(scrapy.Spider):
             
             except:
                 yield dict_hotel
+
+            if index == limit:
+                break
           
 
 

@@ -27,37 +27,22 @@ class booking(scrapy.Spider):
             )
 
     def after_search(self, response):
+        limit = 19 
 
-        limit = 19
-        
-        # fetch addresses from file
+        #fetch addresses from file
         city = response.meta["city"]
-        
-           
         for index, path in enumerate(response.xpath('//*[@data-testid="property-card"]')):
-        
             url = path.xpath('div[1]/div[2]/div/div/div[1]/div/div[1]/div/h3/a').attrib['href']
-            hotel_name = path.xpath('//*[@id="search_results_table"]/div[2]/div/div/div/div[4]/div[3]/div[1]/div[2]/div/div/div[1]/div/div[1]/div[1]/h3/a/div[1]/text()').get()
-            rating = path.xpath('//*[@id="search_results_table"]/div[2]/div/div/div/div[4]/div[3]/div[1]/div[2]/div/div/div[2]/div[1]/a/span/div/div[1]/text()').get()
-            text_description = path.xpath('//*[@id="search_results_table"]/div[2]/div/div/div/div[4]/div[3]/div[1]/div[2]/div/div/div[1]/div/div[4]/text()').get()
-            city = city
-
-
+           
              # call parse_details and pass all of the above to it
             dict_hotel = {
                 'url' : url,
-                'hotel_name' : hotel_name,
-                'rating': rating,
-                'text_description' : text_description,
-                'city' : city
+                'city': city
             } 
-
             try:
-                yield response.follow(url = url, callback = self.parse_detail, cb_kwargs = {'dic':dict_hotel})
-            
+                yield response.follow(url = url, callback = self.parse_detail, cb_kwargs = {'dic':dict_hotel})  
             except:
                 yield dict_hotel
-
             if index == limit:
                 break
           
@@ -65,8 +50,14 @@ class booking(scrapy.Spider):
 
     def parse_detail(self,response,dic):
 
-        lat_lon = response.css('a.jq_tooltip.loc_block_link_underline_fix.bui-link.show_on_map_hp_link.show_map_hp_link').attrib['data-atlas-latlng']
+        lat_lon = response.css('a.jq_tooltip.loc_block_link_underline_fix.bui-link.show_on_map_hp_link.show_map_hp_link').attrib['data-atlas-latlng'],
+        hotel_name = response.xpath('//*[@id="hp_hotel_name"]/div/div/h2/text()').get(),
+        rating = response.xpath('//*[@id="js--hp-gallery-scorecard"]/a/div/div/div/div/div[1]/text()').get(),
+        hotel_description = response.xpath('//*[@id="property_description_content"]/p[1]/text()').get(),
         dic['coordinates'] = lat_lon
+        dic['hotel_name'] = hotel_name
+        dic['rating'] = rating
+        dic['hotel_description'] = hotel_description
         yield dic
 
 

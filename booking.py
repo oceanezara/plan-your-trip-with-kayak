@@ -16,7 +16,7 @@ class booking(scrapy.Spider):
     ]
 
     def parse(self, response):
-        file = open('/Users/oceane/Desktop/plan-your-trip-with-kayak/kayak/kayak/top_city_names.txt', 'r')
+        file = open('kayak/kayak/top_city_names.txt', 'r')
         cities = file.readlines()
         for city in cities:
             yield scrapy.FormRequest.from_response(

@@ -16,7 +16,7 @@ class booking(scrapy.Spider):
     ]
 
     def parse(self, response):
-        file = open('kayak/kayak/top_city_names.txt', 'r')
+        file = open('src/kayak/top_city_names.txt', 'r')
         cities = file.readlines()
         for city in cities:
             yield scrapy.FormRequest.from_response(
@@ -66,8 +66,8 @@ filename = "hotel_url.json"
 
 # If file already exists, delete it before crawling (because Scrapy will 
 # concatenate the last and new results otherwise)
-if filename in os.listdir():
-    os.remove(filename)
+if filename in os.listdir('src/kayak/'):
+    os.remove('src/kayak/' + filename)
 
 
 # Declare a new CrawlerProcess with some settings
@@ -79,7 +79,7 @@ process = CrawlerProcess(settings = {
     'USER_AGENT': 'Chrome/97.0',
     'LOG_LEVEL': logging.INFO,
     "FEEDS": {
-        filename : {"format": "json"},
+       'src/kayak/' +  filename : {"format": "json"},
     },
     'FEED_EXPORT_ENCODING' : 'utf-8'
 })

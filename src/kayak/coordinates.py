@@ -48,7 +48,7 @@ class Geocoder:
     
     def store_results(self):
         # write results to file
-        with open('coordinates.json', 'w') as f:
+        with open('src/kayak/coordinates.json', 'w') as f:
             f.write(json.dumps(self.results, indent=2))
     
     def run(self):
@@ -56,7 +56,7 @@ class Geocoder:
         addresses = ''
         
         # fetch addresses from file
-        with open('/Users/oceane/Desktop/plan-your-trip-with-kayak/kayak/kayak/addresses.txt', 'r') as f:
+        with open('src/kayak/addresses.txt', 'r') as f:
             for line in f.read():
                 addresses += line
         
